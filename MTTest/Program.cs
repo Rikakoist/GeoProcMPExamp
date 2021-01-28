@@ -45,6 +45,7 @@ namespace MTTest
             SW.Stop();
             Console.WriteLine("All done! Time elapsed: {0}", SW.Elapsed.ToString("hh\\:mm\\:ss"));
             Console.ReadKey();
+            Console.ReadKey();
             //ESRI License Initializer generated code.
             //Do not make any call to ArcObjects after ShutDownApplication()
             m_AOLicenseInitializer.ShutdownApplication();
@@ -179,10 +180,18 @@ namespace MTTest
             {
                 for (int i = 0; i < tables.Count; i++)
                 {
-                    Console.WriteLine(string.Format("[{3} Start] Reclassifying {0}, table {1} on thread {2}.", folderName, i + 1, Thread.CurrentThread.ManagedThreadId.ToString(),DateTime.Now.ToString("hh\\:mm\\:ss")));
+                    Console.WriteLine(string.Format("[{3} Start] Reclassifying {0}, table {1} on thread {2}.", folderName, i + 1, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
                     ReclassFunc rF = new ReclassFunc(origDataName, tables[i], Path.Combine(recFolder, string.Format("{0}_table{1}.tif", folderName, (i + 1).ToString("00"))));
-                    rF.Exec();
-                    Console.WriteLine(string.Format("[{3} Done] Reclassify {0}, table {1} on thread {2} done.", folderName, i + 1, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
+                    try
+                    {
+                        rF.Exec();
+                        Console.WriteLine(string.Format("[{3} Done] Reclassify {0}, table {1} on thread {2} done.", folderName, i + 1, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
+                        Thread.Sleep(500);
+                    }
+                    catch (Exception err)
+                    {
+                        Console.WriteLine(string.Format("[{3} Error] Error reclassifying {0}, table {1} on thread {2}.", folderName, i + 1, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
+                    }
                 }
             }
 
@@ -193,8 +202,16 @@ namespace MTTest
                 string tFilename = Path.GetFileNameWithoutExtension(recDataName);
                 Console.WriteLine(string.Format("[{2} Start] Aggregating {0}, on thread {1}.", tFilename, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
                 AggregateFunc aF = new AggregateFunc(recDataName,60,Path.Combine(aggFolder,string.Format("{0}_Agg.tif", tFilename)));
-                aF.Exec();
-                Console.WriteLine(string.Format("[{2} Done] Aggregation {0}, on thread {1} done.", tFilename, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
+                try
+                {
+                    aF.Exec();
+                    Console.WriteLine(string.Format("[{2} Done] Aggregation {0}, on thread {1} done.", tFilename, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
+                    Thread.Sleep(500);
+                }
+                catch (Exception err)
+                {
+                    Console.WriteLine(string.Format("[{2} Error] Aggregating {0}, on thread {1} error.", tFilename, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
+                }
             }
 
             GetRaster(aggFolder);
@@ -203,10 +220,17 @@ namespace MTTest
             {
                 string tFilename = Path.GetFileNameWithoutExtension(aggDataName);
                 Console.WriteLine(string.Format("[{2} Start] Dividing {0} by 3600, on thread {1}.", tFilename, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
-                DivideFunc aF = new DivideFunc(aggDataName, "3600", Path.Combine(resultFolder, string.Format("{0}_Div.tif", tFilename)));
-                aF.Exec();
-                Console.WriteLine(string.Format("[{2} Done] Dividing {0} by 3600, on thread {1} done.", tFilename, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
-
+                DivideFunc dF = new DivideFunc(aggDataName, "3600", Path.Combine(resultFolder, string.Format("{0}_Div.tif", tFilename)));
+                try
+                {
+                    dF.Exec();
+                    Console.WriteLine(string.Format("[{2} Done] Dividing {0} by 3600, on thread {1} done.", tFilename, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
+                    Thread.Sleep(500);
+                }
+                catch(Exception err)
+                {
+                    Console.WriteLine(string.Format("[{2} Error] Dividing {0} by 3600, on thread {1} error.", tFilename, Thread.CurrentThread.ManagedThreadId.ToString(), DateTime.Now.ToString("hh\\:mm\\:ss")));
+                }
             }
 
             doneCallback(Thread.CurrentThread.ManagedThreadId);
