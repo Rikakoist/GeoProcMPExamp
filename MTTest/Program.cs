@@ -24,7 +24,7 @@ namespace MTTest
             if (Debugger.IsAttached)
             {
                 Console.WriteLine("Debug env, workfolder set.");
-                workFolder = @"E:\Test";
+                workFolder = @"E:\Test";    //debug folder
             }
             else
             {
