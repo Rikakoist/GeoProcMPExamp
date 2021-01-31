@@ -24,8 +24,16 @@ namespace MPMain
                 }
                 else
                 {
-                    Console.Write("Set workfolder:");
-                    workFolder = Console.ReadLine();
+                    if (args.Length > 0)
+                    {
+                        workFolder = args[0];
+                        Console.WriteLine("Work folder set to {0}.", workFolder);
+                    }
+                    else
+                    {
+                        Console.Write("Set workfolder:");
+                        workFolder = Console.ReadLine();
+                    }
                 }
 
 
@@ -100,6 +108,8 @@ namespace MPMain
         /// <param name="RootDir">根目录。</param>
         public ThreadManager(string RootDir)
         {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Magenta;
             //获取计算机的处理器数目
             foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_ComputerSystem").Get())
             {
@@ -119,6 +129,7 @@ namespace MPMain
 
             rootDir = RootDir;
             Common.GetAllChildDir(Path.Combine(rootDir, "Picture")).ForEach(n => waitingThreads.Enqueue(CreateThread(n)));  //将待处理路径入队列
+            Console.ResetColor();
         }
 
         /// <summary>
@@ -222,24 +233,29 @@ namespace MPMain
                 using (var p = Process.Start(pSI))
                 {
                     p.WaitForExit();
+                    Console.ForegroundColor = ConsoleColor.White;
                     switch (p.ExitCode)
                     {
                         case 0:
                             {
-                                Console.WriteLine(string.Format("[{1} Process done] Process {0} done.", folderName, DateTime.Now.ToString("hh\\:mm\\:ss")));
+                                Console.BackgroundColor = ConsoleColor.Green;
+                                Console.WriteLine(string.Format("[{1} Process done] Process {0} done.", folderName, DateTime.Now.ToString("HH\\:mm\\:ss")));
                                 break;
                             }
                         case -1:
                             {
-                                Console.WriteLine(string.Format("[{1} Process error] Process {0} error.", folderName, DateTime.Now.ToString("hh\\:mm\\:ss")));
+                                Console.BackgroundColor = ConsoleColor.Red;
+                                Console.WriteLine(string.Format("[{1} Process error] Process {0} error.", folderName, DateTime.Now.ToString("HH\\:mm\\:ss")));
                                 break;
                             }
                         default:
                             {
-                                Console.WriteLine(string.Format("[{1} Unkown error] Process {0} error.", folderName, DateTime.Now.ToString("hh\\:mm\\:ss")));
+                                Console.BackgroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine(string.Format("[{1} Unkown error] Process {0} error.", folderName, DateTime.Now.ToString("HH\\:mm\\:ss")));
                                 break;
                             }
                     }
+                    Console.ResetColor();
                 }
             }
             catch(Exception err)

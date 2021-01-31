@@ -42,7 +42,7 @@ namespace MPChild
     }
 
     /// <summary>
-    /// 真正进行处理的对象。
+    /// 真正进行处理的对象,所有的处理在这里进行。
     /// </summary>
     public class MainProcessor
     {
@@ -110,18 +110,26 @@ namespace MPChild
             {
                 for (int i = 0; i < tables.Count; i++)
                 {
-                    Console.WriteLine(string.Format("[{2} Reclassify start] Reclassifying {0}, table {1}.", folderName, i + 1, DateTime.Now.ToString("hh\\:mm\\:ss")));
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("[{2} Reclassify start] Reclassifying {0}, table {1}.", folderName, i + 1, DateTime.Now.ToString("HH\\:mm\\:ss"));
                     ReclassFunc rF = new ReclassFunc(origDataName, tables[i], Path.Combine(recFolder, string.Format("{0}_table{1}.tif", folderName, (i + 1).ToString("00"))));
                     try
                     {
                         rF.Exec();
-                        Console.WriteLine(string.Format("[{2} Reclassify done] Reclassify {0}, table {1} done.", folderName, i + 1, DateTime.Now.ToString("hh\\:mm\\:ss")));
-                        Thread.Sleep(500);
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
+                        Console.WriteLine("[{2} Reclassify done] Reclassify {0}, table {1} done.", folderName, i + 1, DateTime.Now.ToString("HH\\:mm\\:ss"));
+                        Thread.Sleep(200);
                     }
                     catch (Exception err)
                     {
-                        Console.WriteLine(string.Format("[{2} Reclassify error] Error reclassifying {0}, table {1}.", folderName, i + 1, DateTime.Now.ToString("hh\\:mm\\:ss")));
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("[{2} Reclassify error] Error reclassifying {0}, table {1}.", folderName, i + 1, DateTime.Now.ToString("HH\\:mm\\:ss"));
                         Console.WriteLine(err.ToString());
+                    }
+                    finally
+                    {
+                        Console.ResetColor();
                     }
                 }
             }
@@ -132,18 +140,26 @@ namespace MPChild
             foreach (string recDataName in rasters)
             {
                 string tFilename = Path.GetFileNameWithoutExtension(recDataName);
-                Console.WriteLine(string.Format("[{1} Aggregate start] Aggregating {0}.", tFilename, DateTime.Now.ToString("hh\\:mm\\:ss")));
+                Console.BackgroundColor = ConsoleColor.DarkCyan;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("[{1} Aggregate start] Aggregating {0}.", tFilename, DateTime.Now.ToString("HH\\:mm\\:ss"));
                 AggregateFunc aF = new AggregateFunc(recDataName, 60, Path.Combine(aggFolder, string.Format("{0}_Agg.tif", tFilename)));
                 try
                 {
                     aF.Exec();
-                    Console.WriteLine(string.Format("[{1} Aggregate done] Aggregate {0} done.", tFilename, DateTime.Now.ToString("hh\\:mm\\:ss")));
-                    Thread.Sleep(500);
+                    Console.BackgroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine("[{1} Aggregate done] Aggregate {0} done.", tFilename, DateTime.Now.ToString("HH\\:mm\\:ss"));
+                    Thread.Sleep(200);
                 }
                 catch (Exception err)
                 {
-                    Console.WriteLine(string.Format("[{1} Aggregate error] Aggregating {0} error.", tFilename, DateTime.Now.ToString("hh\\:mm\\:ss")));
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("[{1} Aggregate error] Aggregating {0} error.", tFilename, DateTime.Now.ToString("HH\\:mm\\:ss"));
                     Console.WriteLine(err.ToString());
+                }
+                finally
+                {
+                    Console.ResetColor();
                 }
             }
 
@@ -153,18 +169,26 @@ namespace MPChild
             foreach (string aggDataName in rasters)
             {
                 string tFilename = Path.GetFileNameWithoutExtension(aggDataName);
-                Console.WriteLine(string.Format("[{1} Divide start] Dividing {0} by 3600.", tFilename, DateTime.Now.ToString("hh\\:mm\\:ss")));
+                Console.BackgroundColor = ConsoleColor.DarkCyan;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("[{1} Divide start] Dividing {0} by 3600.", tFilename, DateTime.Now.ToString("HH\\:mm\\:ss"));
                 DivideFunc dF = new DivideFunc(aggDataName, "3600", Path.Combine(resultFolder, string.Format("{0}_Div.tif", tFilename)));
                 try
                 {
                     dF.Exec();
-                    Console.WriteLine(string.Format("[{1} Divide done] Divide {0} by 3600 done.", tFilename, DateTime.Now.ToString("hh\\:mm\\:ss")));
-                    Thread.Sleep(500);
+                    Console.BackgroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine("[{1} Divide done] Divide {0} by 3600 done.", tFilename, DateTime.Now.ToString("HH\\:mm\\:ss"));
+                    Thread.Sleep(200);
                 }
                 catch (Exception err)
                 {
-                    Console.WriteLine(string.Format("[{1} Divide error] Dividing {0} by 3600 error.", tFilename, DateTime.Now.ToString("hh\\:mm\\:ss")));
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("[{1} Divide error] Dividing {0} by 3600 error.", tFilename, DateTime.Now.ToString("HH\\:mm\\:ss"));
                     Console.WriteLine(err.ToString());
+                }
+                finally
+                {
+                    Console.ResetColor();
                 }
             }
         }
@@ -191,4 +215,7 @@ namespace MPChild
         }
     }
 }
-//Reference: https://stackoverflow.com/questions/2807654/multi-threaded-file-processing-with-net
+/* Reference: 
+ * https://stackoverflow.com/questions/2807654/multi-threaded-file-processing-with-net
+ * https://stackoverflow.com/questions/1542213/how-to-find-the-number-of-cpu-cores-via-net-c
+ */
